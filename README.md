@@ -13,8 +13,10 @@ It will looks like this:
 
 Setup modx system settings
 --------------------------
+```
 parser_class_path = {core_path}components/gitmodx/model/gitmodx/
 parser_class = gitModParser
+```
 
 
 Rewrite system index.php files
