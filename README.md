@@ -1,5 +1,9 @@
 # gitmodx
 
+This extension may really improve and speed your development.
+With gitmodx you can create snippets, chunks, system settings and context settings directly from IDE.
+File-based chunks and snippets will not store in database and can by easily managed by git. Your will not need to create db patches or migrations for saving chunks, snippets and settings in control version system (like git).
+
 Installation
 ============
 
