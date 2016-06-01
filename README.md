@@ -86,7 +86,7 @@ Usage
 Now you can write your chunks and snippets directly in file.
 WARNING!!! File-based snippets and chunks with gitmodx mechanism will not store to database, but they will work if you call
 them by modx tags (like `[[$chunkName]]` or `[[$snippetName]]`) or if you call them by modx api (like `$modx->getChunk('chunkName')`
-or `$modx->runSnippet('snippetName')`
+or `$modx->runSnippet('snippetName')` or `$modx->getObject('modChunk',array('name'=>'chunkName'))`)
 
 Create snippet
 --------------
