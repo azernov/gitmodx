@@ -113,3 +113,52 @@ And then you can call this snippet (f.e., in template):
 Create chunk
 ------------
 For chunks you should do the same process, but in core/components/chunks/ catalog.
+
+Create system settings
+----------------------
+If you have often-change system settings you can duplicate them into gitmodx config file.
+
+**But you must remember, that file-based system settings will override system settings stored in database.**
+
+Open core/components/gitmodx/config/config.inc.php
+
+Write some settings:
+
+```php
+<?
+$gitModxConfig = array(
+    'mySetting' => 'someValue',
+    'myAnotherSetting' => 'someAnotherValue`,
+    //You can override standard system setting
+    'site_status' => 0,
+    //So if in database you have site_status = 1, real value will be 0
+);
+
+return $gitModxConfig;
+```
+
+And then you can call this settings by:
+
+```php
+$modx->getOption('mySetting');
+```
+
+or in template/chunk:
+
+```
+[[++mySetting]]
+```
+
+
+Create context settings
+-----------------------
+To create context setting(s) you should do the same process as with system settings. But you should use another config file:
+
+```
+core/components/gitmodx/config/[context_key]/config.inc.php
+```
+
+**But you must remember that settings defined in file will be overriden by context settings stored in database**
+
+So if you defined in file `core/components/gitmodx/config/web/config.inc.php` setting `site_status = 0`, and in modx backend
+in the web-context settings you defined `site_status = 1` real value will be 1
