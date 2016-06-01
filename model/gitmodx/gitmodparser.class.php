@@ -1,0 +1,159 @@
+<?php
+include_once MODX_CORE_PATH . "model/modx/modparser.class.php";
+
+/**
+ * Class gitModParser
+ * Extends standard class of modx parser to make possible store chunks and snippets in files without storing in database
+ */
+class gitModParser extends modParser {
+
+    /**
+     * Search file recursively
+     * @param $path
+     * @param $filename
+     * @param bool $returnRelative
+     * @return bool|string
+     */
+    private function searchFile($path,$filename,$returnRelative = false)
+    {
+        if(file_exists($path.$filename)) {
+            return $returnRelative ? $filename : $path.$filename;
+        }
+        else {
+            //not in main chunks folder, so search in category directories
+            $catFolders = glob($path.'*', GLOB_ONLYDIR);
+            foreach ($catFolders as $catFolder) {
+                if(file_exists($catFolder.'/'.$filename)) {
+                    $catFolderName = end(explode('/', $catFolder));
+                    return $returnRelative ? $catFolderName.'/'.$filename : $path.$catFolderName.'/'.$filename;
+                }
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Loads file based element (modChunk or modSnippet)
+     * @param $class
+     * @param $name
+     * @return bool|modSnippet|modChunk|null
+     */
+    public function getElementFromFile($class, $name) {
+
+        $searchPathRel = $this->modx->getOption('site_elements_path','','core/components/gitmodx/elements/');
+        $searchPath = MODX_BASE_PATH.$searchPathRel;
+
+        //search for chunk in package directory
+        if($class == 'modChunk') {
+            $searchFolder = $searchPath.'chunks/';
+            $searchFile = $name.'.tpl';
+
+            $foundFilePath = $this->searchFile($searchFolder,$searchFile);
+
+
+            //create chunk if we found one
+            if($foundFilePath) {
+                /* @var modChunk $chunk */
+                $chunk = $this->modx->newObject('modChunk');
+                $chunk->set('name', $name);
+                $chunk->set('source', 0); //media source id
+                $chunk->set('static', 1); //create chunk as static file
+                $chunk->set('static_file', $foundFilePath);
+                $chunk->set('snippet', file_get_contents($foundFilePath));
+                return $chunk;
+            }
+        }
+
+        //search for snippet in package directory
+        elseif($class == 'modSnippet') {
+            $searchFolder = $searchPath.'snippets/';
+            $searchFile = $name.'.php';
+            $foundFilePath = $this->searchFile($searchFolder,$searchFile);
+
+            //create snippet if we found one
+            if($foundFilePath) {
+                /* @var modSnippet $snippet */
+                $snippet = $this->modx->newObject('modSnippet');
+                $snippet->set('name', $name);
+                $snippet->set('source', 0); //media source id
+                $snippet->set('static', 1); //create chunk as static file
+                $snippet->set('static_file', $foundFilePath);
+                $snippet->set('snippet', file_get_contents($foundFilePath));
+                //We need to set unique id for correct caching. crc32 - is one of the ways
+                $snippet->set('id',crc32($name));
+                return $snippet;
+            }
+        }
+
+        return false;
+    }
+
+
+    /**
+     * Get a modElement instance taking advantage of the modX::$sourceCache.
+     *
+     * @param string $class The modElement derivative class to load.
+     * @param string $name An element name or raw tagName to identify the modElement instance.
+     * @return modElement|null An instance of the specified modElement derivative class.
+     */
+    public function getElement($class, $name) {
+        $realname = $this->realname($name);
+        if (array_key_exists($class, $this->modx->sourceCache) && array_key_exists($realname, $this->modx->sourceCache[$class])) {
+            /** @var modElement $element */
+            $element = $this->modx->newObject($class);
+            $element->fromArray($this->modx->sourceCache[$class][$realname]['fields'], '', true, true);
+            $element->setPolicies($this->modx->sourceCache[$class][$realname]['policies']);
+
+            if (!empty($this->modx->sourceCache[$class][$realname]['source'])) {
+                if (!empty($this->modx->sourceCache[$class][$realname]['source']['class_key'])) {
+                    $sourceClassKey = $this->modx->sourceCache[$class][$realname]['source']['class_key'];
+                    $this->modx->loadClass('sources.modMediaSource');
+                    /* @var modMediaSource $source */
+                    $source = $this->modx->newObject($sourceClassKey);
+                    $source->fromArray($this->modx->sourceCache[$class][$realname]['source'],'',true,true);
+                    $element->addOne($source,'Source');
+                }
+            }
+        } else {
+            /** @var modElement $element */
+            $element = $this->modx->getObjectGraph($class,array('Source' => array()),array('name' => $realname), true);
+            if ($element && array_key_exists($class, $this->modx->sourceCache)) {
+                $this->modx->sourceCache[$class][$realname] = array(
+                    'fields' => $element->toArray(),
+                    'policies' => $element->getPolicies(),
+                    'source' => $element->Source ? $element->Source->toArray() : array(),
+                );
+            }
+            elseif(!$element) {
+                $element = $this->getElementFromFile($class,$realname);
+                if(!$element)
+                {
+                    $this->modx->log(MODX_LOG_LEVEL_ERROR,'Element ('.$class.') not found: '.$name);
+                    $evtOutput = $this->modx->invokeEvent('OnElementNotFound', array('class' => $class, 'name' => $realname));
+                    $element = false;
+                    if ($evtOutput != false) {
+                        foreach ((array) $evtOutput as $elm) {
+                            if (!empty($elm) && is_string($elm)) {
+                                $element = $this->modx->newObject($class, array(
+                                    'name' => $realname,
+                                    'snippet' => $elm
+                                ));
+                            }
+                            elseif ($elm instanceof modElement ) {
+                                $element = $elm;
+                            }
+
+                            if ($element) {
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        if ($element instanceof modElement) {
+            $element->set('name', $name);
+        }
+        return $element;
+    }
+}

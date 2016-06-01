@@ -1,0 +1,6 @@
+<?
+$webConfig = array(
+
+);
+
+return $webConfig;

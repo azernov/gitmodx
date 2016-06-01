@@ -1,0 +1,6 @@
+<?
+$gitModxConfig = array(
+
+);
+
+return $gitModxConfig;
