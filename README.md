@@ -91,14 +91,16 @@ or `$modx->runSnippet('snippetName')` or `$modx->getObject('modChunk',array('nam
 Create snippet
 --------------
 Go to core/components/gitmodx/elements/snippets/
-You able to make the catalog inside this directory to organize your shippets by purpose.
+
+You can make the catalog inside this directory to organize your shippets by purpose.
 
 For example:
+```
 -core/components/snippets/
 --utils
 --usersnippets
 --productsnippets
-
+```
 
 Create new file yourSnippetName.php (case sensitive):
 ```php
