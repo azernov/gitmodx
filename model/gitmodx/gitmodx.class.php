@@ -94,8 +94,15 @@ class gitModx extends modX
      */
     protected function _loadConfig() {
         parent::_loadConfig();
-        $config = include MODX_CORE_PATH.'components/gitmodx/config/config.inc.php';
-        $this->config = array_merge($this->config, $config);
+        $dir = opendir(MODX_CORE_PATH.'components/gitmodx/config/');
+        while($file = readdir($dir))
+        {
+            if(preg_match('/\.inc\.php/i',$file))
+            {
+                $config = include MODX_CORE_PATH.'components/gitmodx/config/'.$file;
+                $this->config = array_merge($this->config, $config);
+            }
+        }
         $this->_systemConfig= $this->config;
         return true;
     }
@@ -112,12 +119,18 @@ class gitModx extends modX
     protected function _initContext($contextKey, $regenerate = false, $options = null) {
         $initialized = parent::_initContext($contextKey, $regenerate, $options);
         if($initialized){
-            $fileName = MODX_CORE_PATH.'components/gitmodx/config/'.$this->context->key.'/config.inc.php';
-            if(file_exists($fileName))
+            if(is_dir(MODX_CORE_PATH.'components/gitmodx/config/'.$this->context->key))
             {
-                $config = include $fileName;
-                $this->context->config = array_merge($config, $this->context->config);
-                $this->config = array_merge($this->_systemConfig, $this->context->config);
+                $dir = opendir(MODX_CORE_PATH.'components/gitmodx/config/'.$this->context->key);
+                while($file = readdir($dir))
+                {
+                    if(preg_match('/\.inc\.php/i',$file))
+                    {
+                        $config = include MODX_CORE_PATH.'components/gitmodx/config/'.$this->context->key.'/'.$file;
+                        $this->context->config = array_merge($config, $this->context->config);
+                        $this->config = array_merge($this->_systemConfig, $this->context->config);
+                    }
+                }
             }
         }
         return $initialized;
