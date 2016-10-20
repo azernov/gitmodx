@@ -1,11 +1,23 @@
 <?php
-include_once MODX_CORE_PATH . "model/modx/modparser.class.php";
+
+$defaultParentFile = MODX_CORE_PATH . "model/modx/modparser.class.php";
+$pdoParserFile = MODX_CORE_PATH . "/components/pdotools/model/pdotools/pdoparser.class.php";
+$className = 'modParser';
+
+if(file_exists($pdoParserFile)){
+    include_once $pdoParserFile;
+    class middleParser extends pdoParser {};
+}
+else{
+    include_once $defaultParentFile;
+    class middleParser extends modParser {};
+}
 
 /**
  * Class gitModParser
  * Extends standard class of modx parser to make possible store chunks and snippets in files without storing in database
  */
-class gitModParser extends modParser {
+class gitModParser extends middleParser {
 
     /**
      * Search file recursively
