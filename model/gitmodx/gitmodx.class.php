@@ -50,6 +50,40 @@ class gitModx extends modX
     }
 
     /**
+     * Fenom-compatible getCount
+     * @param string $className
+     * @param null $criteria
+     * @return int
+     */
+    public function getCount($className, $criteria = null){
+        switch($className)
+        {
+            case 'modChunk':
+            case 'modSnippet':
+                if(!isset($criteria['name'])){
+                    foreach($criteria as $key => $value){
+                        if(preg_match('#:?name:?#i',$key))
+                        {
+                            $criteria['name'] = $value;
+                            break;
+                        }
+                    }
+                    if(!isset($criteria['name'])) break;
+                }
+
+                if($this->getParser())
+                {
+                    if($element = $this->parser->getElementFromFile($className,$criteria['name']))
+                    {
+                        return 1;
+                    }
+                }
+                break;
+        }
+        return parent::getCount($className,$criteria);
+    }
+
+    /**
      * Override standard getObject method
      * It check if you want to get modChunk or modSnippet object
      * It look firstly in file and if not found - run parent method

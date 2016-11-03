@@ -1,6 +1,7 @@
 <?php
 $pdoToolsConfig = array(
-    'pdotools_fenom_cache' => false, //DON'T SET TRUE!!! WORKS IMPROPERLY
+    //Set to false if you don't want cache fenom-compiled templates
+    'pdotools_fenom_cache' => true,
     //Set to false if you want to use standard MODx syntax
     'pdotools_fenom_default' => true,
     'pdotools_fenom_parser' => true,
