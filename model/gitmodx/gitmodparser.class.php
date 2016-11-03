@@ -23,24 +23,45 @@ class gitModParser extends middleParser {
      * Search file recursively
      * @param $path
      * @param $filename
-     * @param bool $returnRelative
      * @return bool|string
      */
-    private function searchFile($path,$filename,$returnRelative = false)
+    private function searchFile($path,$filename)
     {
-        if(file_exists($path.$filename)) {
-            return $returnRelative ? $filename : $path.$filename;
+        $dir = new RecursiveDirectoryIterator($path);
+        $ite = new RecursiveIteratorIterator($dir);
+        $files = new RegexIterator($ite, '/^.+\/'.preg_quote($filename).'$/', RegexIterator::GET_MATCH);
+
+        if($files){
+            foreach($files as $file){
+                return $file[0];
+            }
         }
-        else {
-            //not in main chunks folder, so search in category directories
-            $catFolders = glob($path.'*', GLOB_ONLYDIR);
-            foreach ($catFolders as $catFolder) {
-                if(file_exists($catFolder.'/'.$filename)) {
-                    $catFolderName = end(explode('/', $catFolder));
-                    return $returnRelative ? $catFolderName.'/'.$filename : $path.$catFolderName.'/'.$filename;
+
+        return false;
+    }
+
+    /**
+     * Search file by crc32 from the filename (without ext)
+     * @param $path
+     * @param $crc32
+     * @param $ext
+     * @return bool|string
+     */
+    private function searchFileByCrc32($path, $crc32, $ext){
+        $dir = new RecursiveDirectoryIterator($path);
+        $ite = new RecursiveIteratorIterator($dir);
+        $files = new RegexIterator($ite, '/^.+'.preg_quote($ext).'$/', RegexIterator::GET_MATCH);
+
+        if($files){
+            foreach($files as $file){
+                $pathinfo = pathinfo($file[0]);
+
+                if($pathinfo['filename'] && crc32($pathinfo['filename']) == $crc32){
+                    return $file[0];
                 }
             }
         }
+
         return false;
     }
 
@@ -48,7 +69,7 @@ class gitModParser extends middleParser {
      * Loads file based element (modChunk or modSnippet)
      * @param $class
      * @param $name
-     * @return bool|modSnippet|modChunk|null
+     * @return bool|modSnippet|modChunk|modPlugin|null
      */
     public function getElementFromFile($class, $name) {
 
@@ -94,6 +115,112 @@ class gitModParser extends middleParser {
                 //We need to set unique id for correct caching. crc32 - is one of the ways
                 $snippet->set('id',crc32($name));
                 return $snippet;
+            }
+        }
+
+        //search for plugin in plugin directory
+        elseif($class == 'modPlugin') {
+            $searchFolder = $searchPath.'plugins/';
+            $searchFile = $name.'.php';
+            $foundFilePath = $this->searchFile($searchFolder, $searchFile);
+
+            if($foundFilePath){
+                /* @var modPlugin $plugin */
+                $plugin = $this->modx->newObject('modPlugin');
+                $plugin->set('name',$name);
+                $plugin->set('source', 0); //media source id
+                $plugin->set('static', 1); //create chunk as static file
+                $plugin->set('static_file', $foundFilePath);
+                $plugin->set('plugincode', file_get_contents($foundFilePath));
+                //We need to set unique id for correct caching. crc32 - is one of the ways
+                $plugin->set('id',crc32($name));
+                return $plugin;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Loads file based element (modChunk or modSnippet or modPlugin) by id
+     * @param $class
+     * @param int $id
+     * @return bool|modSnippet|modChunk|modPlugin|null
+     */
+    public function getElementFromFileById($class, $id) {
+
+        $searchPathRel = $this->modx->getOption('site_elements_path','','core/components/gitmodx/elements/');
+        $searchPath = MODX_BASE_PATH.$searchPathRel;
+
+        //search for chunk in package directory
+        if($class == 'modChunk') {
+            $searchFolder = $searchPath.'chunks/';
+
+            $foundFilePath = $this->searchFileByCrc32($searchFolder,$id, '.tpl');
+            $fileName = end(explode('/',$foundFilePath));
+            $fileNamePcs = explode('.',$fileName);
+            array_pop($fileNamePcs);
+            $name = implode('.',$fileNamePcs);
+
+
+            //create chunk if we found one
+            if($foundFilePath) {
+                /* @var modChunk $chunk */
+                $chunk = $this->modx->newObject('modChunk');
+                $chunk->set('name', $name);
+                $chunk->set('source', 0); //media source id
+                $chunk->set('static', 1); //create chunk as static file
+                $chunk->set('static_file', $foundFilePath);
+                $chunk->set('snippet', file_get_contents($foundFilePath));
+                return $chunk;
+            }
+        }
+
+        //search for snippet in package directory
+        elseif($class == 'modSnippet') {
+            $searchFolder = $searchPath.'snippets/';
+
+            $foundFilePath = $this->searchFileByCrc32($searchFolder,$id, '.php');
+            $fileName = end(explode('/',$foundFilePath));
+            $fileNamePcs = explode('.',$fileName);
+            array_pop($fileNamePcs);
+            $name = implode('.',$fileNamePcs);
+
+            //create snippet if we found one
+            if($foundFilePath) {
+                /* @var modSnippet $snippet */
+                $snippet = $this->modx->newObject('modSnippet');
+                $snippet->set('name', $name);
+                $snippet->set('source', 0); //media source id
+                $snippet->set('static', 1); //create chunk as static file
+                $snippet->set('static_file', $foundFilePath);
+                $snippet->set('snippet', file_get_contents($foundFilePath));
+                //We need to set unique id for correct caching. crc32 - is one of the ways
+                $snippet->set('id',$id);
+                return $snippet;
+            }
+        }
+
+        //search for plugin in plugin directory
+        elseif($class == 'modPlugin') {
+            $searchFolder = $searchPath.'plugins/';
+
+            $foundFilePath = $this->searchFileByCrc32($searchFolder,$id, '.php');
+            $fileName = end(explode('/',$foundFilePath));
+            $fileNamePcs = explode('.',$fileName);
+            array_pop($fileNamePcs);
+            $name = implode('.',$fileNamePcs);
+
+            if($foundFilePath){
+                /* @var modPlugin $plugin */
+                $plugin = $this->modx->newObject('modPlugin');
+                $plugin->set('id',$id);
+                $plugin->set('name',$name);
+                $plugin->set('source', 0); //media source id
+                $plugin->set('static', 1); //create chunk as static file
+                $plugin->set('static_file', $foundFilePath);
+                $plugin->set('plugincode', file_get_contents($foundFilePath));
+                return $plugin;
             }
         }
 

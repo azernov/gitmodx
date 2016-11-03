@@ -81,8 +81,57 @@ class gitModx extends modX
                         return $element;
                     }
                 }
+                break;
+            case 'modPlugin':
+                if(isset($criteria['id'])){
+                    if($this->getParser())
+                    {
+                        if($element = $this->parser->getElementFromFileById($className,$criteria['id']))
+                        {
+                            return $element;
+                        }
+                    }
+                }
+                break;
         }
         return parent::getObject($className,$criteria,$cacheFlag);
+    }
+
+    /**
+     * Gets a map of events and registered plugins for the specified context.
+     *
+     * Service #s:
+     * 1 - Parser Service Events
+     * 2 - Manager Access Events
+     * 3 - Web Access Service Events
+     * 4 - Cache Service Events
+     * 5 - Template Service Events
+     * 6 - User Defined Events
+     *
+     * @param string $contextKey Context identifier.
+     * @return array A map of events and registered plugins for each.
+     */
+    public function getEventMap($contextKey) {
+        $eventElementMap = parent::getEventMap($contextKey);
+
+        if($contextKey){
+            //Extending standard event-plugin map by file-based plugins
+            $pluginsConfigFile = dirname(dirname(dirname(__FILE__))).'/elements/plugins/plugins.inc.php';
+            if(file_exists($pluginsConfigFile)){
+                $gitPluginsMap = include $pluginsConfigFile;
+                $eventElementMap = is_array($eventElementMap) ? $eventElementMap : array();
+                foreach($gitPluginsMap as $eventName => $pluginNames){
+                    if(is_string($pluginNames)) $pluginNames = array($pluginNames);
+
+                    if(!isset($eventElementMap[$eventName])) $eventElementMap[$eventName] = array();
+                    foreach($pluginNames as $pluginName){
+                        $eventElementMap[$eventName][crc32($pluginName)] = crc32($pluginName);
+                    }
+                }
+            }
+        }
+
+        return $eventElementMap;
     }
 
     /**
