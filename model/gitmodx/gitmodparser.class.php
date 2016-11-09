@@ -29,7 +29,7 @@ class gitModParser extends middleParser {
     {
         $dir = new RecursiveDirectoryIterator($path);
         $ite = new RecursiveIteratorIterator($dir);
-        $files = new RegexIterator($ite, '/^.+\/'.preg_quote($filename).'$/', RegexIterator::GET_MATCH);
+        $files = new RegexIterator($ite, '/^.+\\'.DIRECTORY_SEPARATOR.preg_quote($filename).'$/', RegexIterator::GET_MATCH);
 
         if($files){
             foreach($files as $file){
