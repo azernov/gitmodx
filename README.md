@@ -116,11 +116,43 @@ Create chunk
 ------------
 For chunks you should do the same process, but in core/components/chunks/ catalog.
 
+Create plugins
+--------------
+Go to core/components/gitmodx/elements/plugins/
+
+Firstly, create file with the code of plugin. For example, myPlugin.php
+
+Next, you should define the events which the plugin react on.
+
+Go to the file plugins.inc.php and add events and your plugin.
+
+For example:
+```
+<?php
+return array(
+    'OnHandleRequest' => array(
+        'myPlugin'
+    ),
+    'OnLoadWebDocument' => array(
+        'myPlugin
+    )
+);
+```
+
 Create system settings
 ----------------------
 If you have often-change system settings you can duplicate them into gitmodx config file.
 
 **But you must remember, that file-based system settings will override system settings stored in database.**
+
+You also can group settings by separate files *.inc.php
+
+For example:
+```
+core/components/gitmodx/config/config.inc.php
+core/components/gitmodx/config/mycomponent.inc.php
+core/components/gitmodx/config/minishop2.inc.php
+```
 
 Open core/components/gitmodx/config/config.inc.php
 
@@ -158,6 +190,15 @@ To create context setting(s) you should do the same process as with system setti
 
 ```
 core/components/gitmodx/config/[context_key]/config.inc.php
+```
+
+You also can group settings by separate files *.inc.php
+
+For example:
+```
+core/components/gitmodx/config/web/config.inc.php
+core/components/gitmodx/config/web/mycomponent.inc.php
+core/components/gitmodx/config/web/minishop2.inc.php
 ```
 
 **But you must remember that settings defined in file will be overriden by context settings stored in database**

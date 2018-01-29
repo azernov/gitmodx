@@ -25,7 +25,7 @@ foreach($files as $file)
         'static_file' => $fileRelative
     )))
     {
-        $modx->log(MODX_LOG_LEVEL_INFO,'Шаблон '.$name.' уже есть в базе, пропускаем');
+        $modx->log(MODX_LOG_LEVEL_INFO,'Template '.$name.' already in the database');
         continue;
     }
 
@@ -47,10 +47,10 @@ foreach($files as $file)
     $template->set('static_file',$fileRelative);
     if($template->save())
     {
-        $modx->log(MODX_LOG_LEVEL_INFO,'Сохранил шаблон '.$name);
+        $modx->log(MODX_LOG_LEVEL_INFO,'Saved new template: '.$name);
     }
     else
     {
-        $modx->log(MODX_LOG_LEVEL_ERROR,'Не удалось сохранить шаблон '.$name);
+        $modx->log(MODX_LOG_LEVEL_ERROR,'Can not save template '.$name);
     }
 }
