@@ -1,5 +1,5 @@
 #!/usr/bin/env php
-<?
+<?php
 /**
  * Script for automatic loading templates,
  * located at core/components/gitmodx/elements/templates/*.tpl

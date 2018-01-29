@@ -1,5 +1,5 @@
 #!/usr/bin/env php
-<?
+<?php
 /**
  * Script for automatic loading chunks,
  * located at Data Base

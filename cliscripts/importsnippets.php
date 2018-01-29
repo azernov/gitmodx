@@ -1,5 +1,5 @@
 #!/usr/bin/env php
-<?
+<?php
 /**
  * Script for automatic loading snippets,
  * located at Data Base
