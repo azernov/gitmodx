@@ -29,57 +29,12 @@ Rewrite system index.php files
 ------------------------------
 Yes, I know, that rewriting system code is not right. But I have no another solution.
 
-### index.php in base path
-
-Replace include path of modx class in line 27 to:
-```php
-MODX_CORE_PATH . "components/gitmodx/model/gitmodx/gitmodx.class.php"
+Simply run script `cliscripts/changeindex.php`. He will make some replacements in files:
 ```
-
-It will looks like this:
-```php
-...
-/* include the modX class */
-if (!@include_once (MODX_CORE_PATH . "components/gitmodx/model/gitmodx/gitmodx.class.php")) {
-    $errorMessage = 'Site temporarily unavailable';
-...
+MODX_BASE_PATH.'index.php'
+MODX_MANAGER_PATH.'index.php'
+MODX_CONNECTORS_PATH.'index.php'
 ```
-
-Then replace name of modx class from modX to gitModX in line 39:
-```php
-$modx = new gitModx();
-```
-
-
-### index.php in manager path
-
-Do the same operations in manager/index.php
-
-Line 37:
-```php
-...
-if (!(include_once MODX_CORE_PATH . 'components/gitmodx/model/gitmodx/gitmodx.class.php')) {
-...
-```
-
-Line 43:
-```php
-$modx= new gitModx('', array(xPDO::OPT_CONN_INIT => array(xPDO::OPT_CONN_MUTABLE => true)));
-```
-
-### index.php in connectors path
-
-Do the same operations in connectors/index.php
-
-Line 24-26:
-```php
-...
-if (!include_once(MODX_CORE_PATH . 'components/gitmodx/model/gitmodx/gitmodx.class.php')) die();
-
-$modx = new gitModX('', array(xPDO::OPT_CONN_INIT => array(xPDO::OPT_CONN_MUTABLE => true)));
-...
-```
-
 
 Usage
 =====

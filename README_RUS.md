@@ -30,57 +30,12 @@ parser_class = gitModParser
 ------------------------------
 Да, я понимаю, что перезапись файлов ядра - плохое решение. Но, к сожалению, другого решения я не нашел. И тем не менее эти изменения минимальны.
 
-### index.php в корневом каталоге сайта
-
-Замените подключаемый путь файла с классом modx на строке 27 на:
-```php
-MODX_CORE_PATH . "components/gitmodx/model/gitmodx/gitmodx.class.php"
+Просто запустите скрипт `cliscripts/changeindex.php` - он сделает замены в трех файлах:
 ```
-
-Должно получиться как-то так:
-```php
-...
-/* include the modX class */
-if (!@include_once (MODX_CORE_PATH . "components/gitmodx/model/gitmodx/gitmodx.class.php")) {
-    $errorMessage = 'Site temporarily unavailable';
-...
+MODX_BASE_PATH.'index.php'
+MODX_MANAGER_PATH.'index.php'
+MODX_CONNECTORS_PATH.'index.php'
 ```
-
-Затем заменить имя класса modx с modX на gitModX в районе 39 строки:
-```php
-$modx = new gitModx();
-```
-
-
-### index.php в папке manager
-
-Делаем аналогичные операции с файлом manager/index.php
-
-Строка 37:
-```php
-...
-if (!(include_once MODX_CORE_PATH . 'components/gitmodx/model/gitmodx/gitmodx.class.php')) {
-...
-```
-
-Строка 43:
-```php
-$modx= new gitModx('', array(xPDO::OPT_CONN_INIT => array(xPDO::OPT_CONN_MUTABLE => true)));
-```
-
-### index.php в папке с коннекторами
-
-Делаем аналогичные операции с файлом connectors/index.php
-
-Строки 24-26:
-```php
-...
-if (!include_once(MODX_CORE_PATH . 'components/gitmodx/model/gitmodx/gitmodx.class.php')) die();
-
-$modx = new gitModX('', array(xPDO::OPT_CONN_INIT => array(xPDO::OPT_CONN_MUTABLE => true)));
-...
-```
-
 
 Применение
 ==========
