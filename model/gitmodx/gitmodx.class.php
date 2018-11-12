@@ -60,22 +60,24 @@ class gitModx extends modX
         {
             case 'modChunk':
             case 'modSnippet':
-                if(!isset($criteria['name'])){
-                    foreach($criteria as $key => $value){
-                        if(preg_match('#:?name:?#i',$key))
-                        {
-                            $criteria['name'] = $value;
-                            break;
+                if(is_array($criteria)){
+                    if(!isset($criteria['name'])){
+                        foreach($criteria as $key => $value){
+                            if(preg_match('#:?name:?#i',$key))
+                            {
+                                $criteria['name'] = $value;
+                                break;
+                            }
                         }
+                        if(!isset($criteria['name'])) break;
                     }
-                    if(!isset($criteria['name'])) break;
-                }
 
-                if($this->getParser())
-                {
-                    if($element = $this->parser->getElementFromFile($className,$criteria['name']))
+                    if($this->getParser())
                     {
-                        return 1;
+                        if($element = $this->parser->getElementFromFile($className,$criteria['name']))
+                        {
+                            return 1;
+                        }
                     }
                 }
                 break;
