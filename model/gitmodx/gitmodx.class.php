@@ -220,4 +220,34 @@ class gitModx extends modX
         }
         return $initialized;
     }
+
+    /**
+     * Returns settings with specified context
+     * @param $contextKey
+     * @return array|mixed
+     */
+    public function getConfigWithContext($contextKey){
+        $config = $this->_systemConfig;
+
+        /** @var modContext $context */
+        $context = $this->getObject('modContext',array(
+            'key' => $contextKey
+        ));
+        $context->prepare();
+        if(is_dir(MODX_CORE_PATH.'components/gitmodx/config/'.$contextKey))
+        {
+            $dir = opendir(MODX_CORE_PATH.'components/gitmodx/config/'.$contextKey);
+            while($file = readdir($dir))
+            {
+                if(preg_match('/\.inc\.php/i',$file))
+                {
+                    $config = include MODX_CORE_PATH.'components/gitmodx/config/'.$contextKey.'/'.$file;
+                    $context->config = array_merge($config, $context->config);
+                    $config = array_merge($this->_systemConfig, $context->config);
+                }
+            }
+        }
+
+        return $config;
+    }
 }
