@@ -1,7 +1,7 @@
 <?php
 
 $defaultParentFile = MODX_CORE_PATH . "model/modx/modparser.class.php";
-$pdoParserFile = MODX_CORE_PATH . "/components/pdotools/model/pdotools/pdoparser.class.php";
+$pdoParserFile = MODX_CORE_PATH . "components/pdotools/model/pdotools/pdoparser.class.php";
 $className = 'modParser';
 
 if(file_exists($pdoParserFile)){
