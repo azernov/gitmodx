@@ -72,7 +72,7 @@ class gitModParser extends middleParser {
      */
     public function getElementFromFile($class, $name) {
 
-        $searchPathRel = $this->modx->getOption('site_elements_path','',MODX_CORE_PATH.'components/gitmodx/elements/');
+        $searchPathRel = $this->modx->getOption('site_elements_path','',str_replace(MODX_BASE_PATH, '', MODX_CORE_PATH).'components/gitmodx/elements/');
         $searchPath = MODX_BASE_PATH.$searchPathRel;
 
         //search for chunk in package directory
