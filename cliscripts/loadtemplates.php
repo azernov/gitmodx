@@ -18,7 +18,8 @@ $indexWasSaved = false;
 foreach($files as $file)
 {
     $content = file_get_contents($file);
-    $name = end(explode('/',$file));
+    $pieces = explode('/',$file);
+    $name = end($pieces);
     $name = trim(preg_replace('#\.tpl$#ui','',$name));
     $fileRelative = str_replace(MODX_BASE_PATH,'',$file);
 
@@ -26,7 +27,7 @@ foreach($files as $file)
         'static_file' => $fileRelative
     )))
     {
-        $modx->log(MODX_LOG_LEVEL_INFO,'Template '.$name.' already in the database');
+        $modx->log(MODX_LOG_LEVEL_INFO,'Template '.$name.' is already in the database');
         continue;
     }
 
