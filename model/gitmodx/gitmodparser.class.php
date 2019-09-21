@@ -17,6 +17,17 @@ else{
  * Extends standard class of modx parser to make possible store chunks and snippets in files without storing in database
  */
 class gitModParser extends middleParser {
+    private function globRecursive($pattern, $flags = 0)
+    {
+        $files = glob($pattern, $flags);
+
+        foreach (glob(dirname($pattern).'/*', GLOB_ONLYDIR|GLOB_NOSORT) as $dir)
+        {
+            $files = array_merge($files, $this->globRecursive($dir.'/'.basename($pattern), $flags));
+        }
+
+        return $files;
+    }
 
     /**
      * Search file recursively
@@ -26,14 +37,8 @@ class gitModParser extends middleParser {
      */
     private function searchFile($path,$filename)
     {
-        $dir = new RecursiveDirectoryIterator($path);
-        $ite = new RecursiveIteratorIterator($dir);
-        $files = new RegexIterator($ite, '/^.+\\'.DIRECTORY_SEPARATOR.preg_quote($filename).'$/', RegexIterator::GET_MATCH);
-
-        if($files){
-            foreach($files as $file){
-                return $file[0];
-            }
+        if($files = $this->globRecursive($path.$filename)){
+            return $files[0];
         }
 
         return false;
@@ -272,7 +277,7 @@ class gitModParser extends middleParser {
                             'id' => 0,
                             'name' => '',
                             'description' => '',
-                            'class_key' => '',
+                            'class_key' => 'sources.modFileMediaSource',
                             'properties' => [],
                             'is_stream' => true,
                         ]
