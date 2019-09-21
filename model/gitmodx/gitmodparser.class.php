@@ -264,7 +264,21 @@ class gitModParser extends middleParser {
             }
             elseif(!$element) {
                 $element = $this->getElementFromFile($class,$realname);
-                if(!$element)
+                if ($element && array_key_exists($class, $this->modx->sourceCache)) {
+                    $this->modx->sourceCache[$class][$realname] = array(
+                        'fields' => $element->toArray(),
+                        'policies' => $element->getPolicies(),
+                        'source' => [
+                            'id' => 0,
+                            'name' => '',
+                            'description' => '',
+                            'class_key' => '',
+                            'properties' => [],
+                            'is_stream' => true,
+                        ]
+                    );
+                }
+                elseif(!$element)
                 {
                     $this->modx->log(MODX_LOG_LEVEL_ERROR,'Element ('.$class.') not found: '.$name);
                     $evtOutput = $this->modx->invokeEvent('OnElementNotFound', array('class' => $class, 'name' => $realname));
