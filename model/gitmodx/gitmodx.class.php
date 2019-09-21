@@ -250,4 +250,32 @@ class gitModx extends modX
 
         return $config;
     }
+
+    /**
+     * Search context key by setting key and value
+     * @param $key
+     * @param $value
+     * @return bool|false|string
+     */
+    public function findContextBySetting($key, $value){
+        //Open base config dir
+        if(is_dir(MODX_CORE_PATH.'components/gitmodx/config')) {
+            $dir = opendir(MODX_CORE_PATH . 'components/gitmodx/config');
+            while ($contextKey = readdir($dir)) {
+                //Searching context directories
+                if(is_dir(MODX_CORE_PATH.'components/gitmodx/config/'.$contextKey)) {
+                    $dir2 = opendir(MODX_CORE_PATH . 'components/gitmodx/config/' . $contextKey);
+                    while ($file = readdir($dir2)) {
+                        if (preg_match('/\.inc\.php/i', $file)) {
+                            $config = include MODX_CORE_PATH . 'components/gitmodx/config/' . $contextKey . '/' . $file;
+                            if(array_key_exists($key, $config) && $config[$key] == $value){
+                                return $contextKey;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return false;
+    }
 }
