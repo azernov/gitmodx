@@ -94,7 +94,7 @@ class gitModParser extends middleParser {
                 $chunk = $this->modx->newObject('modChunk');
                 $chunk->set('name', $name);
                 $chunk->set('source', 0); //media source id
-                $chunk->set('static', 1); //create chunk as static file
+                //$chunk->set('static', 1); //create chunk as static file
                 $chunk->set('static_file', $foundFilePath);
                 $chunk->set('snippet', file_get_contents($foundFilePath));
                 return $chunk;
@@ -113,7 +113,7 @@ class gitModParser extends middleParser {
                 $snippet = $this->modx->newObject('modSnippet');
                 $snippet->set('name', $name);
                 $snippet->set('source', 0); //media source id
-                $snippet->set('static', 1); //create chunk as static file
+                //$snippet->set('static', 0); //create chunk as static file
                 $snippet->set('static_file', $foundFilePath);
                 $snippet->set('snippet', file_get_contents($foundFilePath));
                 //We need to set unique id for correct caching. crc32 - is one of the ways
@@ -133,7 +133,7 @@ class gitModParser extends middleParser {
                 $plugin = $this->modx->newObject('modPlugin');
                 $plugin->set('name',$name);
                 $plugin->set('source', 0); //media source id
-                $plugin->set('static', 1); //create chunk as static file
+                //$plugin->set('static', 1); //create chunk as static file
                 $plugin->set('static_file', $foundFilePath);
                 $plugin->set('plugincode', file_get_contents($foundFilePath));
                 //We need to set unique id for correct caching. crc32 - is one of the ways
@@ -173,7 +173,7 @@ class gitModParser extends middleParser {
                 $chunk = $this->modx->newObject('modChunk');
                 $chunk->set('name', $name);
                 $chunk->set('source', 0); //media source id
-                $chunk->set('static', 1); //create chunk as static file
+                //$chunk->set('static', 1); //create chunk as static file
                 $chunk->set('static_file', $foundFilePath);
                 $chunk->set('snippet', file_get_contents($foundFilePath));
                 return $chunk;
@@ -196,7 +196,7 @@ class gitModParser extends middleParser {
                 $snippet = $this->modx->newObject('modSnippet');
                 $snippet->set('name', $name);
                 $snippet->set('source', 0); //media source id
-                $snippet->set('static', 1); //create chunk as static file
+                //$snippet->set('static', 1); //create chunk as static file
                 $snippet->set('static_file', $foundFilePath);
                 $snippet->set('snippet', file_get_contents($foundFilePath));
                 //We need to set unique id for correct caching. crc32 - is one of the ways
@@ -221,7 +221,7 @@ class gitModParser extends middleParser {
                 $plugin->set('id',$id);
                 $plugin->set('name',$name);
                 $plugin->set('source', 0); //media source id
-                $plugin->set('static', 1); //create chunk as static file
+                //$plugin->set('static', 1); //create chunk as static file
                 $plugin->set('static_file', $foundFilePath);
                 $plugin->set('plugincode', file_get_contents($foundFilePath));
                 return $plugin;
