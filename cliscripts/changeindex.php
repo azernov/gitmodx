@@ -32,3 +32,43 @@ foreach($coreIncFiles as $file => $replace){
     $content = preg_replace("#define\('MODX_CORE_PATH', '([^']+)'\);#mu", "define('MODX_CORE_PATH', {$replace});", $content);
     file_put_contents($file,$content);
 }
+
+//Parser system settings
+/** @var modSystemSetting $systemSetting */
+$systemSetting = $modx->getObject('modSystemSetting', [
+    'key' => 'parser_class'
+]);
+$setPrimaryKeys = false;
+if(!$systemSetting){
+    $systemSetting = $modx->newObject('modSystemSetting');
+    $setPrimaryKeys = true;
+}
+$systemSetting->fromArray([
+    'key' => 'parser_class',
+    'value' => 'gitModParser',
+    'xtype' => 'textfield',
+    'namespace' => 'pdotools',
+    'area' => 'pdotools_main',
+    'editedon' => time()
+],'',$setPrimaryKeys);
+$systemSetting->save();
+
+
+/** @var modSystemSetting $systemSetting */
+$systemSetting = $modx->getObject('modSystemSetting', [
+    'key' => 'parser_class_path'
+]);
+$setPrimaryKeys = false;
+if(!$systemSetting){
+    $systemSetting = $modx->newObject('modSystemSetting');
+    $setPrimaryKeys = true;
+}
+$systemSetting->fromArray([
+    'key' => 'parser_class_path',
+    'value' => '{core_path}components/gitmodx/model/gitmodx/',
+    'xtype' => 'textfield',
+    'namespace' => 'pdotools',
+    'area' => 'pdotools_main',
+    'editedon' => time()
+],'',$setPrimaryKeys);
+$systemSetting->save();
