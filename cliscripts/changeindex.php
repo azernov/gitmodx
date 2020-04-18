@@ -33,6 +33,8 @@ foreach($coreIncFiles as $file => $replace){
     file_put_contents($file,$content);
 }
 
+define("MODX_API_MODE", true);
+include MODX_BASE_PATH.'index.php';
 //Parser system settings
 /** @var modSystemSetting $systemSetting */
 $systemSetting = $modx->getObject('modSystemSetting', [
