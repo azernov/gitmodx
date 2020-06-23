@@ -17,15 +17,21 @@ else{
  * Extends standard class of modx parser to make possible store chunks and snippets in files without storing in database
  */
 class gitModParser extends middleParser {
+    private $cachedGlobs = [];
+
     private function globRecursive($pattern, $flags = 0)
     {
+        $cacheKey = md5($pattern.$flags);
+        if(isset($this->cachedGlobs[$cacheKey])){
+            return $this->cachedGlobs[$cacheKey];
+        }
         $files = glob($pattern, $flags);
 
         foreach (glob(dirname($pattern).'/*', GLOB_ONLYDIR|GLOB_NOSORT) as $dir)
         {
             $files = array_merge($files, $this->globRecursive($dir.'/'.basename($pattern), $flags));
         }
-
+        $this->cachedGlobs[$cacheKey] = $files;
         return $files;
     }
 
@@ -161,7 +167,8 @@ class gitModParser extends middleParser {
             $searchFolder = $searchPath.'chunks/';
 
             $foundFilePath = $this->searchFileByCrc32($searchFolder,$id, '.tpl');
-            $fileName = end(explode('/',$foundFilePath));
+            $foundFilePieces = explode('/',$foundFilePath);
+            $fileName = end($foundFilePieces);
             $fileNamePcs = explode('.',$fileName);
             array_pop($fileNamePcs);
             $name = implode('.',$fileNamePcs);
@@ -185,7 +192,8 @@ class gitModParser extends middleParser {
             $searchFolder = $searchPath.'snippets/';
 
             $foundFilePath = $this->searchFileByCrc32($searchFolder,$id, '.php');
-            $fileName = end(explode('/',$foundFilePath));
+            $foundFilePieces = explode('/',$foundFilePath);
+            $fileName = end($foundFilePieces);
             $fileNamePcs = explode('.',$fileName);
             array_pop($fileNamePcs);
             $name = implode('.',$fileNamePcs);
@@ -210,7 +218,8 @@ class gitModParser extends middleParser {
             $searchFolder = $searchPath.'plugins/';
 
             $foundFilePath = $this->searchFileByCrc32($searchFolder,$id, '.php');
-            $fileName = end(explode('/',$foundFilePath));
+            $foundFilePieces = explode('/',$foundFilePath);
+            $fileName = end($foundFilePieces);
             $fileNamePcs = explode('.',$fileName);
             array_pop($fileNamePcs);
             $name = implode('.',$fileNamePcs);

@@ -110,7 +110,7 @@ class gitModx extends modX
                     if(!isset($criteria['name'])) break;
                 }
 
-                if($this->getParser())
+                if($this->getParser() && $this->parser instanceof gitModParser)
                 {
                     if($element = $this->parser->getElementFromFile($className,$criteria['name']))
                     {
@@ -120,7 +120,7 @@ class gitModx extends modX
                 break;
             case 'modPlugin':
                 if(isset($criteria['id'])){
-                    if($this->getParser())
+                    if($this->getParser() && $this->parser instanceof gitModParser)
                     {
                         if($element = $this->parser->getElementFromFileById($className,$criteria['id']))
                         {
