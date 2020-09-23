@@ -17,13 +17,18 @@ else{
  * Extends standard class of modx parser to make possible store chunks and snippets in files without storing in database
  */
 class gitModParser extends middleParser {
-    private $cachedGlobs = [];
-
     private function globRecursive($pattern, $flags = 0)
     {
         $cacheKey = md5($pattern.$flags);
-        if(isset($this->cachedGlobs[$cacheKey])){
-            return $this->cachedGlobs[$cacheKey];
+        $cacheManager = $this->modx->getCacheManager();
+        $cachedGlobs = $cacheManager->get('gitmodparser_globs');
+        if(!$cachedGlobs){
+            $cachedGlobs = [];
+        }
+
+
+        if(isset($cachedGlobs[$cacheKey])){
+            return $cachedGlobs[$cacheKey];
         }
         $files = glob($pattern, $flags);
 
@@ -31,7 +36,8 @@ class gitModParser extends middleParser {
         {
             $files = array_merge($files, $this->globRecursive($dir.'/'.basename($pattern), $flags));
         }
-        $this->cachedGlobs[$cacheKey] = $files;
+        $cachedGlobs[$cacheKey] = $files;
+        $cacheManager->set('gitmodparser_globs', $cachedGlobs);
         return $files;
     }
 
@@ -58,16 +64,13 @@ class gitModParser extends middleParser {
      * @return bool|string
      */
     private function searchFileByCrc32($path, $crc32, $ext){
-        $dir = new RecursiveDirectoryIterator($path);
-        $ite = new RecursiveIteratorIterator($dir);
-        $files = new RegexIterator($ite, '/^.+'.preg_quote($ext).'$/', RegexIterator::GET_MATCH);
-
+        $files = $this->globRecursive($path.'*'.$ext);
         if($files){
             foreach($files as $file){
-                $pathinfo = pathinfo($file[0]);
+                $pathinfo = pathinfo($file);
 
                 if($pathinfo['filename'] && crc32($pathinfo['filename']) == $crc32){
-                    return $file[0];
+                    return $file;
                 }
             }
         }
