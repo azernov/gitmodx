@@ -1,6 +1,6 @@
 # gitmodx
 
-This extension may really improve and speed your development.
+This extension may really improve and speed up your development on MODX Revolution.
 
 With gitmodx you can create snippets, chunks, system settings and context settings directly from IDE.
 
