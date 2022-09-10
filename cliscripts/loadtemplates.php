@@ -14,14 +14,18 @@ $modx->setLogLevel(MODX_LOG_LEVEL_INFO);
 $firstTemplate = $modx->getObject('modTemplate',1);
 
 $files = glob(dirname(dirname(__FILE__)).'/elements/templates/*.tpl');
+//Replace backslash to slash if we run script from Windows OS
+$basePath = str_replace('\\', '/', MODX_BASE_PATH);
 $indexWasSaved = false;
 foreach($files as $file)
 {
+    //Replace backslash to slash if we run script from Windows OS
+    $file = str_replace('\\', '/', $file);
     $content = file_get_contents($file);
     $pieces = explode('/',$file);
     $name = end($pieces);
     $name = trim(preg_replace('#\.tpl$#ui','',$name));
-    $fileRelative = str_replace(MODX_BASE_PATH,'',$file);
+    $fileRelative = str_replace($basePath,'',$file);
 
     if($template = $modx->getObject('modTemplate',array(
         'static_file' => $fileRelative
