@@ -1,22 +1,28 @@
 <?php
 
-$defaultParentFile = MODX_CORE_PATH . "model/modx/modparser.class.php";
-$pdoParserFile = MODX_CORE_PATH . "components/pdotools/model/pdotools/pdoparser.class.php";
+namespace GitModx;
 
-if(file_exists($pdoParserFile)){
-    include_once $pdoParserFile;
-    class middleParser extends pdoParser {};
+//$defaultParentFile = MODX_CORE_PATH . "model/modx/modparser.class.php";
+//$pdoParserFile = MODX_CORE_PATH . "components/pdotools/model/pdotools/pdoparser.class.php";
+
+use MODX\Revolution\modChunk;
+use MODX\Revolution\modElement;
+use MODX\Revolution\modPlugin;
+use MODX\Revolution\modSnippet;
+use MODX\Revolution\Sources\modMediaSource;
+
+if(class_exists('\ModxPro\PdoTools\Parsing\Parser')){
+    class MiddleParser extends \ModxPro\PdoTools\Parsing\Parser {}
 }
 else{
-    include_once $defaultParentFile;
-    class middleParser extends modParser {};
-}
+    class MiddleParser extends \MODX\Revolution\modParser {}
+};
 
 /**
  * Class gitModParser
  * Extends standard class of modx parser to make possible store chunks and snippets in files without storing in database
  */
-class gitModParser extends middleParser {
+class Parser extends MiddleParser {
     private function globRecursive($pattern, $flags = 0)
     {
         $cacheKey = md5($pattern.$flags);
@@ -90,7 +96,7 @@ class gitModParser extends middleParser {
         $searchPath = MODX_BASE_PATH.$searchPathRel;
 
         //search for chunk in package directory
-        if($class == 'modChunk') {
+        if($class == \MODX\Revolution\modChunk::class) {
             $searchFolder = $searchPath.'chunks/';
             $searchFile = $name.'.tpl';
 
@@ -100,7 +106,7 @@ class gitModParser extends middleParser {
             //create chunk if we found one
             if($foundFilePath) {
                 /* @var modChunk $chunk */
-                $chunk = $this->modx->newObject('modChunk');
+                $chunk = $this->modx->newObject(\MODX\Revolution\modChunk::class);
                 $chunk->set('name', $name);
                 $chunk->set('source', 0); //media source id
                 //$chunk->set('static', 1); //create chunk as static file
@@ -111,7 +117,7 @@ class gitModParser extends middleParser {
         }
 
         //search for snippet in package directory
-        elseif($class == 'modSnippet') {
+        elseif($class == \MODX\Revolution\modSnippet::class) {
             $searchFolder = $searchPath.'snippets/';
             $searchFile = $name.'.php';
             $foundFilePath = $this->searchFile($searchFolder,$searchFile);
@@ -119,7 +125,7 @@ class gitModParser extends middleParser {
             //create snippet if we found one
             if($foundFilePath) {
                 /* @var modSnippet $snippet */
-                $snippet = $this->modx->newObject('modSnippet');
+                $snippet = $this->modx->newObject(\MODX\Revolution\modSnippet::class);
                 $snippet->set('name', $name);
                 $snippet->set('source', 0); //media source id
                 //$snippet->set('static', 0); //create chunk as static file
@@ -132,14 +138,14 @@ class gitModParser extends middleParser {
         }
 
         //search for plugin in plugin directory
-        elseif($class == 'modPlugin') {
+        elseif($class == \MODX\Revolution\modPlugin::class) {
             $searchFolder = $searchPath.'plugins/';
             $searchFile = $name.'.php';
             $foundFilePath = $this->searchFile($searchFolder, $searchFile);
 
             if($foundFilePath){
                 /* @var modPlugin $plugin */
-                $plugin = $this->modx->newObject('modPlugin');
+                $plugin = $this->modx->newObject(\MODX\Revolution\modPlugin::class);
                 $plugin->set('name',$name);
                 $plugin->set('source', 0); //media source id
                 //$plugin->set('static', 1); //create chunk as static file
@@ -166,7 +172,7 @@ class gitModParser extends middleParser {
         $searchPath = MODX_BASE_PATH.$searchPathRel;
 
         //search for chunk in package directory
-        if($class == 'modChunk') {
+        if($class == \MODX\Revolution\modChunk::class) {
             $searchFolder = $searchPath.'chunks/';
 
             $foundFilePath = $this->searchFileByCrc32($searchFolder,$id, '.tpl');
@@ -180,7 +186,7 @@ class gitModParser extends middleParser {
             //create chunk if we found one
             if($foundFilePath) {
                 /* @var modChunk $chunk */
-                $chunk = $this->modx->newObject('modChunk');
+                $chunk = $this->modx->newObject(\MODX\Revolution\modChunk::class);
                 $chunk->set('name', $name);
                 $chunk->set('source', 0); //media source id
                 //$chunk->set('static', 1); //create chunk as static file
@@ -191,7 +197,7 @@ class gitModParser extends middleParser {
         }
 
         //search for snippet in package directory
-        elseif($class == 'modSnippet') {
+        elseif($class == \MODX\Revolution\modSnippet::class) {
             $searchFolder = $searchPath.'snippets/';
 
             $foundFilePath = $this->searchFileByCrc32($searchFolder,$id, '.php');
@@ -204,7 +210,7 @@ class gitModParser extends middleParser {
             //create snippet if we found one
             if($foundFilePath) {
                 /* @var modSnippet $snippet */
-                $snippet = $this->modx->newObject('modSnippet');
+                $snippet = $this->modx->newObject(\MODX\Revolution\modSnippet::class);
                 $snippet->set('name', $name);
                 $snippet->set('source', 0); //media source id
                 //$snippet->set('static', 1); //create chunk as static file
@@ -217,7 +223,7 @@ class gitModParser extends middleParser {
         }
 
         //search for plugin in plugin directory
-        elseif($class == 'modPlugin') {
+        elseif($class == \MODX\Revolution\modPlugin::class) {
             $searchFolder = $searchPath.'plugins/';
 
             $foundFilePath = $this->searchFileByCrc32($searchFolder,$id, '.php');
@@ -229,7 +235,7 @@ class gitModParser extends middleParser {
 
             if($foundFilePath){
                 /* @var modPlugin $plugin */
-                $plugin = $this->modx->newObject('modPlugin');
+                $plugin = $this->modx->newObject(\MODX\Revolution\modPlugin::class);
                 $plugin->set('id',$id);
                 $plugin->set('name',$name);
                 $plugin->set('source', 0); //media source id
@@ -262,7 +268,6 @@ class gitModParser extends middleParser {
             if (!empty($this->modx->sourceCache[$class][$realname]['source'])) {
                 if (!empty($this->modx->sourceCache[$class][$realname]['source']['class_key'])) {
                     $sourceClassKey = $this->modx->sourceCache[$class][$realname]['source']['class_key'];
-                    $this->modx->loadClass('sources.modMediaSource');
                     /* @var modMediaSource $source */
                     $source = $this->modx->newObject($sourceClassKey);
                     $source->fromArray($this->modx->sourceCache[$class][$realname]['source'],'',true,true);

@@ -5,8 +5,11 @@
  * located at core/components/gitmodx/elements/templates/*.tpl
  * to Data Base as static templates
  */
+
+use MODX\Revolution\modTemplate;
+
 define("MODX_API_MODE",true);
-require_once dirname(dirname(dirname(dirname(dirname(__FILE__))))) . '/index.php';
+require_once dirname(__FILE__, 5) . '/index.php';
 
 $modx->setLogTarget('ECHO');
 $modx->setLogLevel(MODX_LOG_LEVEL_INFO);

@@ -1,6 +1,6 @@
 #!/usr/bin/env php
 <?php
-
+//TODO заменить логику обновления index файлов с учетом пространств имен и подключения autoload.php
 /**
  * Automaticaly replace include path and class name to gitmodx in index.php files and change absolute path in core.inc.php files
  */

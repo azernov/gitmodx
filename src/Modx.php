@@ -1,14 +1,17 @@
 <?php
-include_once MODX_CORE_PATH . "model/modx/modx.class.php";
+namespace GitModx;
+
+use MODX\Revolution\modChunk;
+use MODX\Revolution\modContext;
+use MODX\Revolution\modSnippet;
 
 /**
  * Class gitModx
  * Extends standard MODx base class to allow work with elements without storing to database
- * @property gitModParser parser
+ * @property \GitModx\Parser parser
  */
-class gitModx extends modX
+class Modx extends \MODX\Revolution\modX
 {
-
     /**
      * Override standard runSnippet
      * Firstly it search snippet in file. If not found - run parent method
@@ -87,7 +90,7 @@ class gitModx extends modX
 
     /**
      * Override standard getObject method
-     * It check if you want to get modChunk or modSnippet object
+     * It checks if you want to get modChunk or modSnippet object
      * It look firstly in file and if not found - run parent method
      * @param string $className
      * @param null $criteria
@@ -110,7 +113,7 @@ class gitModx extends modX
                     if(!isset($criteria['name'])) break;
                 }
 
-                if($this->getParser() && $this->parser instanceof gitModParser)
+                if($this->getParser() && $this->parser instanceof Parser)
                 {
                     if($element = $this->parser->getElementFromFile($className,$criteria['name']))
                     {
@@ -120,7 +123,7 @@ class gitModx extends modX
                 break;
             case 'modPlugin':
                 if(isset($criteria['id'])){
-                    if($this->getParser() && $this->parser instanceof gitModParser)
+                    if($this->getParser() && $this->parser instanceof Parser)
                     {
                         if($element = $this->parser->getElementFromFileById($className,$criteria['id']))
                         {
